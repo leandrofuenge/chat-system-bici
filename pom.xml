@@ -49,6 +49,18 @@
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-starter-amqp</artifactId>
       </dependency>
+      <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+      <dependency>
+          <groupId>mysql</groupId>
+          <artifactId>mysql-connector-java</artifactId>
+          <version>8.0.33</version>
+      </dependency>
+
+       <dependency>
+       	<groupId>com.example</groupId>
+       	<artifactId>bici</artifactId>
+       	<version>0.0.1-SNAPSHOT</version>
+       </dependency>
 	</dependencies>
 
 	<build>
