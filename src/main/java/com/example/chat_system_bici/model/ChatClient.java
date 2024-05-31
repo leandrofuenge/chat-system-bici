@@ -38,6 +38,12 @@ public class ChatClient {
         }
     }
 
+    public void sendMessage(String message) {
+        if (out != null) {
+            out.println(message);
+        }
+    }
+
     private class ReadMessageTask implements Runnable {
         public void run() {
             try {
@@ -56,15 +62,11 @@ public class ChatClient {
             try (Scanner scanner = new Scanner(System.in)) {
                 while (true) {
                     String message = scanner.nextLine();
-                    out.println(message);
+                    sendMessage(message);
                 }
             } catch (Exception e) {
                 System.out.println("Error sending message: " + e.getMessage());
             }
         }
-    }
-
-    public void sendMessage(String message) {
-        throw new UnsupportedOperationException("Unimplemented method 'sendMessage'");
     }
 }
