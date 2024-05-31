@@ -1,6 +1,9 @@
 package com.example.chat_system_bici.controller;
 
 import com.example.chat_system_bici.model.ChatClient;
+import com.example.chat_system_bici.service.ChatMessageSender;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +15,14 @@ import java.util.concurrent.Executors;
 @RestController
 @RequestMapping("/chat")
 public class ChatClientController {
+	
+    private final ChatMessageSender chatMessageSender;
+
+    @Autowired
+    public ChatClientController(ChatMessageSender chatMessageSender) {
+        this.chatMessageSender = chatMessageSender;
+    }
+	
     private ChatClient chatClient;
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
@@ -50,18 +61,17 @@ public class ChatClientController {
         }
     }
 
+    
+    
+    
     @PostMapping("/send")
     public ResponseEntity<String> sendMessage(@RequestParam String message) {
-        if (chatClient == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Not connected to any chat server");
-        }
-
         if (message == null || message.trim().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Message cannot be null or empty");
         }
 
         try {
-            chatClient.sendMessage(message);
+            chatMessageSender.sendMessage(message);
             return ResponseEntity.ok("Message sent");
         } catch (Exception e) {
             e.printStackTrace();
