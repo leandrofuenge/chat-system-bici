@@ -5,14 +5,18 @@ import java.net.Socket;
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ChatClient {
-    private String serverName;
-    private int serverPort;
+    private static final Logger logger = LoggerFactory.getLogger(ChatClient.class);
+    private final String serverName;
+    private final int serverPort;
     private Socket socket;
     private PrintWriter out;
     private BufferedReader in;
-    private ExecutorService executorService;
+    private final ExecutorService executorService;
+    private volatile boolean running = true;
 
     public ChatClient(String serverName, int serverPort) {
         this.serverName = serverName;
@@ -22,7 +26,7 @@ public class ChatClient {
 
     public void start() throws IOException {
         socket = new Socket(serverName, serverPort);
-        System.out.println("Connected to chat server");
+        logger.info("Connected to chat server at {}:{}", serverName, serverPort);
 
         out = new PrintWriter(socket.getOutputStream(), true);
         in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -32,10 +36,12 @@ public class ChatClient {
     }
 
     public void stop() throws IOException {
+        running = false;
         executorService.shutdownNow();
         if (socket != null && !socket.isClosed()) {
             socket.close();
         }
+        logger.info("Disconnected from chat server");
     }
 
     public void sendMessage(String message) {
@@ -48,11 +54,15 @@ public class ChatClient {
         public void run() {
             try {
                 String message;
-                while ((message = in.readLine()) != null) {
+                while (running && (message = in.readLine()) != null) {
                     System.out.println(message);
                 }
             } catch (IOException e) {
-                System.out.println("Error reading from server: " + e.getMessage());
+                if (running) {
+                    logger.error("Error reading from server", e);
+                } else {
+                    logger.info("Stopped reading from server");
+                }
             }
         }
     }
@@ -60,12 +70,18 @@ public class ChatClient {
     private class SendMessageTask implements Runnable {
         public void run() {
             try (Scanner scanner = new Scanner(System.in)) {
-                while (true) {
-                    String message = scanner.nextLine();
-                    sendMessage(message);
+                while (running) {
+                    if (scanner.hasNextLine()) {
+                        String message = scanner.nextLine();
+                        sendMessage(message);
+                    }
                 }
             } catch (Exception e) {
-                System.out.println("Error sending message: " + e.getMessage());
+                if (running) {
+                    logger.error("Error sending message", e);
+                } else {
+                    logger.info("Stopped sending messages");
+                }
             }
         }
     }

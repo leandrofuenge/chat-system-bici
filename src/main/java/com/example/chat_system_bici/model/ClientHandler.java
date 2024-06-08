@@ -8,12 +8,12 @@ import java.net.Socket;
 import java.util.Set;
 
 public class ClientHandler extends Thread {
-    private Socket socket;
+    private final Socket socket;
     private String clientName;
     private PrintWriter out;
     private BufferedReader in;
-    private Set<Socket> clientSockets;
-    private Set<String> clientNames;
+    private final Set<Socket> clientSockets;
+    private final Set<String> clientNames;
 
     public ClientHandler(Socket socket, Set<Socket> clientSockets, Set<String> clientNames) {
         this.socket = socket;

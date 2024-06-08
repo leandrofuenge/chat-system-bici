@@ -10,9 +10,9 @@ import java.util.concurrent.Executors;
 
 public class ChatServer {
     private static final int PORT = 12345;
-    private static Set<Socket> clientSockets = new HashSet<>();
-    private static Set<String> clientNames = new HashSet<>();
-    private static ExecutorService executorService = Executors.newCachedThreadPool();
+    private static final Set<Socket> clientSockets = new HashSet<>();
+    private static final Set<String> clientNames = new HashSet<>();
+    private static final ExecutorService executorService = Executors.newCachedThreadPool();
 
     public static void main(String[] args) {
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
